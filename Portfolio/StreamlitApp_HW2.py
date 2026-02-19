@@ -97,13 +97,14 @@ def call_model_api(input_df):
         endpoint_name=MODEL_INFO["endpoint"],
         sagemaker_session=sm_session,
         serializer=NumpySerializer(),
-        deserializer=NumpyDeserializer() 
+        deserializer=NumpyDeserializer()
     )
 
     try:
-        raw_pred = predictor.predict(input_df)
-        pred_val = pd.DataFrame(raw_pred).values[-1][0]
-        return round(float(pred_val), 4), 200
+        # IMPORTANT: NumpySerializer expects a numpy array
+        raw_pred = predictor.predict(input_df.to_numpy())
+        pred_val = float(np.array(raw_pred).ravel()[0])
+        return round(pred_val, 4), 200
     except Exception as e:
         return f"Error: {str(e)}", 500
 
@@ -141,9 +142,9 @@ with st.form("pred_form"):
 if submitted:
 
     data_row = [user_inputs[k] for k in MODEL_INFO["keys"]]
-    # Prepare data
-    base_df = df_features
-    input_df = pd.concat([base_df, pd.DataFrame([data_row], columns=base_df.columns)])
+
+    # ONLY send one row (the user input), not df_features
+    input_df = pd.DataFrame([data_row], columns=MODEL_INFO["keys"])
     
     res, status = call_model_api(input_df)
     if status == 200:
@@ -151,5 +152,6 @@ if submitted:
         display_explanation(input_df,session, aws_bucket)
     else:
         st.error(res)
+
 
 
