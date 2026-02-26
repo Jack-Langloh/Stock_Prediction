@@ -133,7 +133,7 @@ with st.form("pred_form"):
         with cols[i % 2]:
             user_inputs[inp['name']] = st.number_input(
                 inp['name'].replace('_', ' ').upper(),
-                min_value=inp['min'], max_value=inp['max'], value=inp['default'], step=inp['step']
+                min_value=inp['min'], value=inp['default'], step=inp['step']
             )
     
     submitted = st.form_submit_button("Run Prediction")
@@ -151,6 +151,7 @@ if submitted:
         display_explanation(input_df,session, aws_bucket)
     else:
         st.error(res)
+
 
 
 
