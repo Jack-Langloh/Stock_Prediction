@@ -156,9 +156,10 @@ if submitted:
     res, status = call_model_api(input_df)
     if status == 200:
         st.metric("Prediction Result", res)
-        display_explanation(input_df,session, aws_bucket)
+        display_explanation(input_df, session, aws_bucket)
     else:
         st.error(res)
+
 
 
 
