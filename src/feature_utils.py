@@ -20,7 +20,7 @@ def extract_features():
     
     START_DATE = (datetime.date.today() - datetime.timedelta(days=365)).strftime("%Y-%m-%d")
     END_DATE = datetime.date.today().strftime("%Y-%m-%d")
-    stk_tickers = ['MSFT', 'IBM', 'GOOGL']
+    stk_tickers = ['SRE', 'SO', 'PAYX']
     ccy_tickers = ['DEXJPUS', 'DEXUSUK']
     idx_tickers = ['SP500', 'DJIA', 'VIXCLS']
     
@@ -29,10 +29,10 @@ def extract_features():
     ccy_data = web.DataReader(ccy_tickers, 'fred', start=START_DATE, end=END_DATE)
     idx_data = web.DataReader(idx_tickers, 'fred', start=START_DATE, end=END_DATE)
 
-    Y = np.log(stk_data.loc[:, ('Adj Close', 'MSFT')]).diff(return_period).shift(-return_period)
+    Y = np.log(stk_data.loc[:, ('Adj Close', 'SRE')]).diff(return_period).shift(-return_period)
     Y.name = Y.name[-1]+'_Future'
     
-    X1 = np.log(stk_data.loc[:, ('Adj Close', ('GOOGL', 'IBM'))]).diff(return_period)
+    X1 = np.log(stk_data.loc[:, ('Adj Close', ('PAYX', 'SO'))]).diff(return_period)
     X1.columns = X1.columns.droplevel()
     X2 = np.log(ccy_data).diff(return_period)
     X3 = np.log(idx_data).diff(return_period)
@@ -53,15 +53,15 @@ def extract_features_pair():
 
     START_DATE = (datetime.date.today() - datetime.timedelta(days=365)).strftime("%Y-%m-%d")
     END_DATE = datetime.date.today().strftime("%Y-%m-%d")
-    stk_tickers = ['AAPL', 'MPWR']
+    stk_tickers = ['KO', 'KR']
     
     stk_data = yf.download(stk_tickers, start=START_DATE, end=END_DATE, auto_adjust=False)
 
-    Y = stk_data.loc[:, ('Adj Close', 'AAPL')]
-    Y.name = 'AAPL'
+    Y = stk_data.loc[:, ('Adj Close', 'KO')]
+    Y.name = 'KO'
 
-    X = stk_data.loc[:, ('Adj Close', 'MPWR')]
-    X.name = 'MPWR'
+    X = stk_data.loc[:, ('Adj Close', 'KR')]
+    X.name = 'KR'
 
     dataset = pd.concat([Y, X], axis=1).dropna()
     Y = dataset.loc[:, Y.name]
