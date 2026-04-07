@@ -18,7 +18,7 @@ def extract_features():
     
     START_DATE = (datetime.date.today() - datetime.timedelta(days=365)).strftime("%Y-%m-%d")
     END_DATE = datetime.date.today().strftime("%Y-%m-%d")
-    stk_tickers = ['MSFT', 'IBM', 'GOOGL']
+    stk_tickers = ['FDX', 'UPS', 'XPO']
     ccy_tickers = ['DEXJPUS', 'DEXUSUK']
     idx_tickers = ['SP500', 'DJIA', 'VIXCLS']
     
@@ -27,10 +27,10 @@ def extract_features():
     ccy_data = web.DataReader(ccy_tickers, 'fred', start=START_DATE, end=END_DATE)
     idx_data = web.DataReader(idx_tickers, 'fred', start=START_DATE, end=END_DATE)
 
-    Y = np.log(stk_data.loc[:, ('Adj Close', 'MSFT')]).diff(return_period).shift(-return_period)
+    Y = np.log(stk_data.loc[:, ('Adj Close', 'FDX')]).diff(return_period).shift(-return_period)
     Y.name = Y.name[-1]+'_Future'
     
-    X1 = np.log(stk_data.loc[:, ('Adj Close', ('GOOGL', 'IBM'))]).diff(return_period)
+    X1 = np.log(stk_data.loc[:, ('Adj Close', ('UPS', 'XPO'))]).diff(return_period)
     X1.columns = X1.columns.droplevel()
     X2 = np.log(ccy_data).diff(return_period)
     X3 = np.log(idx_data).diff(return_period)
@@ -51,15 +51,15 @@ def extract_features_pair():
 
     START_DATE = (datetime.date.today() - datetime.timedelta(days=365)).strftime("%Y-%m-%d")
     END_DATE = datetime.date.today().strftime("%Y-%m-%d")
-    stk_tickers = ['AAPL', 'MPWR']
+    stk_tickers = ['AAPL', 'MSFT']
     
     stk_data = yf.download(stk_tickers, start=START_DATE, end=END_DATE, auto_adjust=False)
 
     Y = stk_data.loc[:, ('Adj Close', 'AAPL')]
     Y.name = 'AAPL'
 
-    X = stk_data.loc[:, ('Adj Close', 'MPWR')]
-    X.name = 'MPWR'
+    X = stk_data.loc[:, ('Adj Close', 'MSFT')]
+    X.name = 'MSFT'
 
     dataset = pd.concat([Y, X], axis=1).dropna()
     Y = dataset.loc[:, Y.name]
@@ -95,7 +95,7 @@ def convert_input_pca_regression(request_body, request_content_type):
 
     dataset = pd.read_csv(file_path,index_col=0)
 
-    target = 'MSFT'
+    target = 'FDX'
 
     option = 2
 
@@ -103,22 +103,22 @@ def convert_input_pca_regression(request_body, request_content_type):
 
         X = FeatureEngineer(windows=[10,15]).transform(dataset[[target]])
     
-        techIndicator_1 = 'RSI_15'
-        RSI_15 = json.loads(request_body)[techIndicator_1]
-        techIndicator_2 = 'MOM_15'
-        MOM_15 = json.loads(request_body)[techIndicator_2]
+        techIndicator_1 = 'MA_15'
+        MA_15 = json.loads(request_body)[techIndicator_1]
+        techIndicator_2 = 'EMA_15'
+        EMA_15 = json.loads(request_body)[techIndicator_2]
 
         # Calculate the distance
         distances = np.sqrt(
-            (X[techIndicator_1] - RSI_15)**2 + 
-            (X[techIndicator_2] - MOM_15)**2
+            (X[techIndicator_1] - MA_15)**2 + 
+            (X[techIndicator_2] - EMA_15)**2
         )
         
         closest_index = distances.idxmin()
         closest_row = X.loc[[closest_index]]
     
-        closest_row[techIndicator_1] = RSI_15
-        closest_row[techIndicator_2] = MOM_15
+        closest_row[techIndicator_1] = MA_15
+        closest_row[techIndicator_2] = EMA_15
     
         return closest_row
     else:
