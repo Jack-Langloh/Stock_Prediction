@@ -55,8 +55,8 @@ sm_session = sagemaker.Session(boto_session=session)
 
 MODEL_INFO = {
         "endpoint": aws_endpoint,
-        "explainer": 'explainer_kpca.shap', 
-        "pipeline": 'finalized_kpca_model.tar.gz', 
+        "explainer": 'explainer_pca.shap', 
+        "pipeline": 'finalized_pca_model.tar.gz', 
         "keys": ["MA_15","EMA_15"], 
         "inputs": [{"name": k, "type": "number", "min": -100.0, "max": 100.0, "default": 0.0, "step": 10.0} for k in ["MA_15","EMA_15"]] 
 }
