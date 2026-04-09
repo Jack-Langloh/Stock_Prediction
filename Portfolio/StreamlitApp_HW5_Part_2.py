@@ -55,8 +55,8 @@ sm_session = sagemaker.Session(boto_session=session)
 
 MODEL_INFO = {
         "endpoint": aws_endpoint,
-        "explainer": 'explainer_pca.shap', 
-        "pipeline": 'finalized_pca_model.tar.gz', 
+        "explainer": 'explainer_kpca.shap', 
+        "pipeline": 'finalized_kpca_model.tar.gz', 
         "keys": ["MA_15","EMA_15"], 
         "inputs": [{"name": k, "type": "number", "min": -100.0, "max": 100.0, "default": 0.0, "step": 10.0} for k in ["MA_15","EMA_15"]] 
 }
@@ -116,9 +116,9 @@ def display_explanation(input_df, session, aws_bucket):
 
     best_pipeline = load_pipeline(session, aws_bucket, 'sklearn-pipeline-deployment')
     
-    preprocessing_pipeline = Pipeline(steps=best_pipeline.steps[0:2]) 
+    preprocessing_pipeline = Pipeline(steps=best_pipeline.steps[:-1]) 
     input_df_transformed = preprocessing_pipeline.transform(input_df) 
-    feature_names = best_pipeline[0:2].get_feature_names_out() 
+    feature_names = best_pipeline[:-1].get_feature_names_out() 
     input_df_transformed = pd.DataFrame(input_df_transformed, columns=feature_names) 
     shap_values = explainer(input_df_transformed) 
 
