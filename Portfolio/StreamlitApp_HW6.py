@@ -57,14 +57,17 @@ session = get_session(aws_id, aws_secret, aws_token)
 sm_session = sagemaker.Session(boto_session=session)
 
 # Data & Model Configuration
-df_features = extract_features()
+# df_features = extract_features()
 
 MODEL_INFO = {
-        "endpoint": aws_endpoint,
-        "explainer": 'explainer_sentiment.shap',
-        "pipeline": 'finalized_sentiment_model.tar.gz',
-        "keys": ['ADBE','MSFT','JPM','sentiment_textblob'],
-        "inputs": [{"name": k, "type": "number", "min": -1.0, "max": 1.0, "default": 0.0, "step": 0.01} for k in ['ADBE','MSFT','JPM','sentiment_textblob']]
+    "endpoint": aws_endpoint,
+    "explainer": 'explainer_sentiment.shap',
+    "pipeline": 'finalized_sentiment_model.tar.gz',
+    "keys": ['AMZN','NFLX','TSLA','FB','WMT','MSFT','JPM','PredictedSentiment','GOOG','AAPL'],
+    "inputs": [
+        {"name": k, "type": "number", "min": -1.0, "max": 1.0, "default": 0.0, "step": 0.01}
+        for k in ['AMZN','NFLX','TSLA','FB','WMT','MSFT','JPM','PredictedSentiment','GOOG','AAPL']
+    ]
 }
 
 def load_pipeline(_session, bucket, key):
