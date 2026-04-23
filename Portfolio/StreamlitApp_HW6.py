@@ -153,6 +153,7 @@ def display_explanation(input_df, session, aws_bucket):
 # Streamlit UI
 st.set_page_config(page_title="ML Deployment", layout="wide")
 st.title("👨‍💻 ML Deployment")
+st.subheader("Target Stock: ADBE")
 
 with st.form("pred_form"):
     st.subheader(f"Inputs")
