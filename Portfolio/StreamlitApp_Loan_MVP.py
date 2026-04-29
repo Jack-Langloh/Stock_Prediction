@@ -105,7 +105,7 @@ if submitted:
     if prob is not None:
         st.metric("Estimated Default Probability", f"{prob:.1%}")
 
-    display_explanation(input_df, session, aws_bucket)
+    # display_explanation(input_df, session, aws_bucket)
         
     st.subheader("Decision Transparency")
     try:
