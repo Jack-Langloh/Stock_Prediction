@@ -96,9 +96,23 @@ if submitted:
         deserializer=JSONDeserializer()
     )
 
-    response = predictor.predict(input_row.to_dict(orient="records"))
-    pred = response.get("prediction", [None])[0]
-    prob = response.get("probability_default", [None])[0]
+    try:
+        response = predictor.predict(input_row.to_dict(orient="records"))
+
+        # Handle different possible SageMaker response formats
+        if isinstance(response, dict):
+            pred = response.get("prediction", [None])[0]
+            prob = response.get("probability_default", [None])[0]
+        elif isinstance(response, list):
+            pred = response[0]
+            prob = None
+        else:
+            pred = int(response)
+            prob = None
+
+    except Exception as e:
+        st.error(f"Prediction failed: {e}")
+        st.stop()
 
     label = "Likely Default / Charged Off" if pred == 1 else "Likely Fully Paid"
     st.metric("Prediction", label)
